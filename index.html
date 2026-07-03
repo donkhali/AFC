@@ -3,7 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard de EjecuciÃ³n & AnÃ¡lisis Macro</title>
+    <title>Dashboard de Ejecución & Análisis Macro</title>
+    
+    <!-- CONFIGURACIÓN DE ICONOS PARA NAVEGADOR Y TELÉFONO -->
+    <link rel="icon" type="image/png" href="comercio.png">
+    <link rel="apple-touch-icon" href="comercio.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MacroAnálisis">
+
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -19,13 +27,17 @@
 
     <!-- TOP BAR -->
     <header class="border-b border-zinc-800 bg-zinc-900/50 backdrop-blur sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
-        <div>
-            <h1 class="text-xl font-bold tracking-tight text-emerald-400">ðŸ“Š SISTEMA INTEGRADO DE ANÃLISIS MACRO</h1>
-            <p class="text-xs text-zinc-400">Fondo de Cobertura Cripto â€¢ Monitoreo de Riesgo y EjecuciÃ³n</p>
+        <div class="flex items-center gap-3">
+            <!-- Miniatura del icono en la barra superior -->
+            <img src="comercio.png" alt="Logo" class="w-7 h-7 object-contain">
+            <div>
+                <h1 class="text-xl font-bold tracking-tight text-emerald-400">📊 SISTEMA INTEGRADO DE ANÁLISIS MACRO</h1>
+                <p class="text-xs text-zinc-400">Fondo de Cobertura Cripto • Monitoreo de Riesgo y Ejecución</p>
+            </div>
         </div>
         <div class="text-right">
             <span id="current-date" class="text-sm font-mono text-zinc-300"></span>
-            <div class="text-xs text-emerald-500 font-medium animate-pulse">â— Feed de Datos Directo (CoinGecko)</div>
+            <div class="text-xs text-emerald-500 font-medium animate-pulse">● Feed de Datos Directo (CoinGecko)</div>
         </div>
     </header>
 
@@ -36,47 +48,47 @@
             <div class="flex justify-between items-center">
                 <h2 class="text-sm font-bold text-zinc-400 uppercase tracking-wider">Precios en Tiempo Real</h2>
                 <button onclick="fetchPrices()" class="px-2.5 py-1 bg-zinc-900 hover:bg-zinc-800 text-[11px] rounded border border-zinc-800 transition text-zinc-300">
-                    ðŸ”„ Actualizar
+                    🔄 Actualizar
                 </button>
             </div>
 
             <!-- GRID DE CRIPTOS (PARES_4.TXT) -->
             <div id="crypto-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2 max-h-[75vh] overflow-y-auto pr-1">
-                <!-- Cargado dinÃ¡micamente -->
+                <!-- Cargado dinámicamente -->
             </div>
         </section>
 
-        <!-- PANEL DERECHO: DASHBOARD OPERATIVO Y RESULTADO DEL ANÃLISIS -->
+        <!-- PANEL DERECHO: DASHBOARD OPERATIVO Y RESULTADO DEL ANÁLISIS -->
         <section class="lg:col-span-2 space-y-4">
             <h2 class="text-sm font-bold text-zinc-400 uppercase tracking-wider">Panel de Control Operativo</h2>
             
-            <!-- CONFIGURACIÃ“N DE FILTROS -->
+            <!-- CONFIGURACIÓN DE FILTROS -->
             <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label class="text-xs text-amber-400 font-semibold block mb-1">ðŸš¨ EN ZONA DE INTERÃ‰S (Separados por coma):</label>
+                    <label class="text-xs text-amber-400 font-semibold block mb-1">🚨 EN ZONA DE INTERÉS (Separados por coma):</label>
                     <input id="input-zona" type="text" value="SOLUSDT, SUIUSDT, RENDERUSDT" class="w-full bg-zinc-950 border border-zinc-800 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-amber-500 font-mono">
                 </div>
                 <div>
-                    <label class="text-xs text-blue-400 font-semibold block mb-1">ðŸ“ˆ EN DESARROLLO (Trades Activos):</label>
+                    <label class="text-xs text-blue-400 font-semibold block mb-1">📈 EN DESARROLLO (Trades Activos):</label>
                     <input id="input-desarrollo" type="text" value="Ninguno" class="w-full bg-zinc-950 border border-zinc-800 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-blue-500 font-mono">
                 </div>
             </div>
 
-            <!-- BOTÃ“N DE ACCIÃ“N ÃšNICO -->
+            <!-- BOTÓN DE ACCIÓN ÚNICO -->
             <button onclick="generateReport()" class="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold rounded-xl transition shadow-lg shadow-emerald-950/20 text-sm tracking-wide uppercase">
-                âš¡ EJECUTAR ANÃLISIS Y GENERAR REPORTE FINAL
+                ⚡ EJECUTAR ANÁLISIS Y GENERAR REPORTE FINAL
             </button>
 
             <!-- CONTENEDOR DEL REPORTE DE SALIDA -->
             <div id="report-output" class="hidden bg-zinc-900 border border-zinc-800 rounded-xl p-6 space-y-6 max-h-[58vh] overflow-y-auto">
-                <!-- El reporte final formateado se inyecta aquÃ­ -->
+                <!-- El reporte final formateado se inyecta aquí -->
             </div>
         </section>
     </main>
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-        // Lista oficial extraÃ­da de Pares_4.txt
+        // Lista oficial extraída de Pares_4.txt[cite: 5]
         const pares = [
             "AAVEUSDT", "ADAUSDT", "APTUSDT", "ARBUSDT", "ATOMUSDT", "AVAXUSDT", 
             "BCHUSDT", "BTCUSDT", "DOGEUSDT", "DOTUSDT", "ETCUSDT", "ETHUSDT", 
@@ -98,7 +110,7 @@
         };
 
         let marketPrices = {};
-        let textReportForSharing = ""; // Variable global para almacenar el texto plano compilado
+        let textReportForSharing = ""; 
 
         function setDate() {
             const opciones = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -149,55 +161,51 @@
             container.innerHTML = '';
             container.classList.remove('hidden');
 
-            // Inicializar variable de texto plano para compartir
-            textReportForSharing = `ðŸ“‹ REPORTE DIARIO DE EJECUCIÃ“N (${fechaHoy})\n`;
-            textReportForSharing += `Fondo de Cobertura Cripto â€¢ Estrategia Macro 90D\n\n`;
+            textReportForSharing = `📋 REPORTE DIARIO DE EJECUCIÓN (${fechaHoy})\n`;[cite: 6]
+            textReportForSharing += `Fondo de Cobertura Cripto • Estrategia Macro 90D\n\n`;[cite: 6]
 
-            // 1. DASHBOARD HEADER HTML
             const headerHTML = `
                 <div class="border-b border-zinc-800 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
-                        <h2 class="text-lg font-bold text-zinc-100">ðŸ“‹ REPORTE DIARIO DE EJECUCIÃ“N</h2>
-                        <p class="text-xs text-zinc-400 mt-1">AnÃ¡lisis estructural basado en la acciÃ³n del precio y datos on-chain.</p>
+                        <h2 class="text-lg font-bold text-zinc-100">📋 REPORTE DIARIO DE EJECUCIÓN</h2>
+                        <p class="text-xs text-zinc-400 mt-1">Análisis estructural basado en la acción del precio y datos on-chain.</p>
                     </div>
                     <button onclick="copySharedText()" class="w-full sm:w-auto px-4 py-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-xs font-bold text-emerald-400 rounded-lg flex items-center justify-center gap-2 transition shrink-0">
-                        ðŸ”— COPIAR REPORTE PARA REDES
+                        🔗 COPIAR REPORTE PARA REDES
                     </button>
                 </div>
             `;
 
-            // 2. CLASIFICACIÃ“N DE ACTIVOS
             const waitingList = pares.filter(p => !zonaInput.includes(p) && !desarrolloInput.includes(p)).join(', ');
             
-            textReportForSharing += `1. CLASIFICACIÃ“N LÃ“GICA DE ACTIVOS:\n`;
-            textReportForSharing += `ðŸš¨ EN ZONA DE INTERÃ‰S: ${zonaInput || 'Ninguno'}\n`;
-            textReportForSharing += `ðŸ“ˆ EN DESARROLLO: ${desarrolloInput || 'Ninguno'}\n\n`;
+            textReportForSharing += `1. CLASIFICACIÓN LÓGICA DE ACTIVOS:\n`;[cite: 6]
+            textReportForSharing += `🚨 EN ZONA DE INTERÉS: ${zonaInput || 'Ninguno'}\n`;[cite: 6]
+            textReportForSharing += `📈 EN DESARROLLO: ${desarrolloInput || 'Ninguno'}\n\n`;[cite: 6]
 
             const dashboardHTML = `
                 <div class="space-y-2">
-                    <h3 class="text-xs font-bold text-zinc-400 uppercase tracking-wider">1. ClasificaciÃ³n LÃ³gica de Activos (Dashboard)</h3>
+                    <h3 class="text-xs font-bold text-zinc-400 uppercase tracking-wider">1. Clasificación Lógica de Activos (Dashboard)</h3>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
                         <div class="bg-zinc-950 p-3 rounded-lg border border-zinc-800/60">
-                            <span class="text-amber-400 font-bold block mb-1">ðŸš¨ EN ZONA DE INTERÃ‰S</span>
+                            <span class="text-amber-400 font-bold block mb-1">🚨 EN ZONA DE INTERÉS</span>
                             <p class="font-mono text-zinc-300">${zonaInput || 'Ninguno'}</p>
                         </div>
                         <div class="bg-zinc-950 p-3 rounded-lg border border-zinc-800/60">
-                            <span class="text-blue-400 font-bold block mb-1">ðŸ“ˆ EN DESARROLLO</span>
+                            <span class="text-blue-400 font-bold block mb-1">📈 EN DESARROLLO</span>
                             <p class="font-mono text-zinc-300">${desarrolloInput || 'Ninguno'}</p>
                         </div>
                         <div class="bg-zinc-950 p-3 rounded-lg border border-zinc-800/60">
-                            <span class="text-zinc-500 font-bold block mb-1">â³ EN ESPERA</span>
+                            <span class="text-zinc-500 font-bold block mb-1">⏳ EN ESPERA</span>
                             <p class="font-mono text-zinc-400 truncate" title="${waitingList}">${waitingList}</p>
                         </div>
                     </div>
                 </div>
             `;
 
-            // 3. ANÃLISIS TOP 3 ACTIVOS
             let topActivosHTML = `<div class="space-y-4">
-                <h3 class="text-xs font-bold text-zinc-400 uppercase tracking-wider">2. Ventana de AcciÃ³n: Top 3 Activos del DÃ­a</h3>`;
+                <h3 class="text-xs font-bold text-zinc-400 uppercase tracking-wider">2. Ventana de Acción: Top 3 Activos del Día</h3>`;
             
-            textReportForSharing += `2. VENTANA DE ACCIÃ“N (TOP 3 ACTIVOS):\n`;
+            textReportForSharing += `2. VENTANA DE ACCIÓN (TOP 3 ACTIVOS):\n`;[cite: 6]
 
             const top3 = ["SOLUSDT", "SUIUSDT", "RENDERUSDT"];
             
@@ -213,12 +221,11 @@
                 let tp2 = precioBase * 1.32;
                 let tp3 = precioBase * 1.55;
 
-                // Agregar datos estructurados al reporte de texto para compartir
-                textReportForSharing += `ðŸ“Š ${activo} (Precio: ${precioStr})\n`;
-                textReportForSharing += `â€¢ A. TÃ©cnico: Rebotando en soportes institucionales clave de 1D. Agotamiento vendedor activo en 4H.\n`;
-                textReportForSharing += `â€¢ðŸ›’ DCA: C1: $${c1.toFixed(2)} (40%) | C2: $${c2.toFixed(2)} (30%) | C3: $${c3.toFixed(2)} (30%)\n`;
-                textReportForSharing += `â€¢ðŸ›‘ Stop-Loss: $${sl.toFixed(2)}\n`;
-                textReportForSharing += `â€¢ðŸŽ¯ Targets: TP1: $${tp1.toFixed(2)} | TP2: $${tp2.toFixed(2)} | TP3: $${tp3.toFixed(2)}\n\n`;
+                textReportForSharing += `📊 ${activo} (Precio: ${precioStr})\n`;[cite: 6]
+                textReportForSharing += `• A. Técnico: Rebotando en soportes institucionales clave de 1D. Agotamiento vendedor activo en 4H.\n`;[cite: 6]
+                textReportForSharing += `• 🛒 DCA: C1: $${c1.toFixed(2)} (40%) | C2: $${c2.toFixed(2)} (30%) | C3: $${c3.toFixed(2)} (30%)\n`;[cite: 6]
+                textReportForSharing += `• 🛑 Stop-Loss: $${sl.toFixed(2)}\n`;[cite: 6]
+                textReportForSharing += `• 🎯 Targets: TP1: $${tp1.toFixed(2)} | TP2: $${tp2.toFixed(2)} | TP3: $${tp3.toFixed(2)}\n\n`;[cite: 6]
 
                 topActivosHTML += `
                     <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 space-y-3">
@@ -228,15 +235,15 @@
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
                             <div class="space-y-1">
-                                <span class="text-zinc-400 font-medium block">A. ActualizaciÃ³n TÃ©cnica (GrÃ¡fico 1D / 4H)</span>
-                                <p class="text-zinc-300">CotizaciÃ³n interactuando sobre niveles clave de soporte diario. Estructura de 4H denota agotamiento de la presiÃ³n de venta en el bloque comprador institucional. Gatillo macro diario activo.</p>
+                                <span class="text-zinc-400 font-medium block">A. Actualización Técnica (Gráfico 1D / 4H)</span>
+                                <p class="text-zinc-300">Cotización interactuando sobre niveles clave de soporte diario. Estructura de 4H denota agotamiento de la presión de venta en el bloque comprador institucional. Gatillo macro diario activo.</p>
                             </div>
                             <div class="space-y-1.5">
-                                <span class="text-zinc-400 font-medium block">B. GestiÃ³n de Riesgo (Fase Operativa)</span>
+                                <span class="text-zinc-400 font-medium block">B. Gestión de Riesgo (Fase Operativa)</span>
                                 <div class="font-mono text-[11px] space-y-0.5 bg-zinc-900/50 p-2 rounded border border-zinc-900">
-                                    <div class="text-amber-400"><span class="font-bold">ðŸ›’ DCA:</span> C1: $${c1.toFixed(2)} (40%) | C2: $${c2.toFixed(2)} (30%) | C3: $${c3.toFixed(2)} (30%)</div>
-                                    <div class="text-red-400"><span class="font-bold">ðŸ›‘ Stop-Loss:</span> $${sl.toFixed(2)}</div>
-                                    <div class="text-emerald-400"><span class="font-bold">ðŸŽ¯ Targets:</span> TP1: $${tp1.toFixed(2)} (50%) | TP2: $${tp2.toFixed(2)} (30%) | TP3: $${tp3.toFixed(2)} (20%)</div>
+                                    <div class="text-amber-400"><span class="font-bold">🛒 DCA:</span> C1: $${c1.toFixed(2)} (40%) | C2: $${c2.toFixed(2)} (30%) | C3: $${c3.toFixed(2)} (30%)</div>
+                                    <div class="text-red-400"><span class="font-bold">🛑 Stop-Loss:</span> $${sl.toFixed(2)}</div>
+                                    <div class="text-emerald-400"><span class="font-bold">🎯 Targets:</span> TP1: $${tp1.toFixed(2)} (50%) | TP2: $${tp2.toFixed(2)} (30%) | TP3: $${tp3.toFixed(2)} (20%)</div>
                                 </div>
                             </div>
                         </div>
@@ -245,51 +252,72 @@
             });
             topActivosHTML += `</div>`;
 
-            // 4. ESCENARIOS Y ADVERTENCIAS
             const btcPrecio = marketPrices["BTCUSDT"] ? `$${marketPrices["BTCUSDT"].toLocaleString()}` : "$59,150";
             
-            textReportForSharing += `3. PROYECCIÃ“N Y ESCENARIOS:\n`;
-            textReportForSharing += `â€¢ Escenario Base (75%): ConsolidaciÃ³n y rebote tÃ©cnico diario hacia TP1 en las prÃ³ximas 48-72h.\n`;
-            textReportForSharing += `â€¢ Escenario Alternativo (25%): PÃ©rdida del pivote macro en BTC (${btcPrecio}) invalida el anÃ¡lisis.\n\n`;
-            textReportForSharing += `4. ADVERTENCIAS:\nAlta selectividad de liquidez. Se prioriza estrictamente la acciÃ³n del precio real sobre indicadores retrasados.\n\n`;
-            textReportForSharing += `âš ï¸ Descargo de responsabilidad: Este anÃ¡lisis es una opiniÃ³n personal basada en datos grÃ¡ficos, no constituye una recomendaciÃ³n de inversiÃ³n.\n\n`;
-            textReportForSharing += `ðŸ‘ si mi contenido te es Ãºtil dale manito arriba y ayÃºdame a seguir analizando para ti.`;
+            textReportForSharing += `3. PROYECCIÓN Y ESCENARIOS:\n`;[cite: 6]
+            textReportForSharing += `• Escenario Base (75%): Consolidación y rebote técnico diario hacia TP1 en las próximas 48-72h.\n`;[cite: 6]
+            textReportForSharing += `• Escenario Alternativo (25%): Pérdida del pivote macro en BTC (${btcPrecio}) invalida el análisis.\n\n`;[cite: 6]
+            textReportForSharing += `4. ADVERTENCIAS:\nAlta selectividad de liquidez. Se prioriza estrictamente la acción del precio real sobre indicadores retrasados.\n\n`;[cite: 6]
+            textReportForSharing += `⚠️ Descargo de responsabilidad: Este análisis es una opinión personal basada en datos gráficos, no constituye una recomendación de inversión.\n\n`;[cite: 6]
+            textReportForSharing += `👍 si mi contenido te es útil dale manito arriba y ayúdame a seguir analizando para ti.`;[cite: 6]
 
             const escenariosHTML = `
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
                     <div class="bg-zinc-950 p-3 rounded-lg border border-zinc-800/60 space-y-1">
-                        <h4 class="font-bold text-zinc-300">3. ProyecciÃ³n y Escenarios del DÃ­a</h4>
-                        <p class="text-zinc-400"><span class="text-emerald-400 font-semibold">Escenario Base (75%):</span> ConsolidaciÃ³n en los soportes actuales y posterior rebote tÃ©cnico diario hacia las zonas de TP1 durante las prÃ³ximas 48 a 72 horas.</p>
-                        <p class="text-zinc-400"><span class="text-red-400 font-semibold">Escenario Alternativo (25%):</span> PÃ©rdida directa del pivote macro en BTC (${btcPrecio}). Esto invalidarÃ¡ los gatillos locales y ejecutarÃ¡ los cierres preventivos de riesgo.</p>
+                        <h4 class="font-bold text-zinc-300">3. Proyección y Escenarios del Día</h4>
+                        <p class="text-zinc-400"><span class="text-emerald-400 font-semibold">Escenario Base (75%):</span> Consolidación en los soportes actuales y posterior rebote técnico diario hacia las zonas de TP1 durante las próximas 48 a 72 horas.</p>
+                        <p class="text-zinc-400"><span class="text-red-400 font-semibold">Escenario Alternativo (25%):</span> Pérdida directa del pivote macro en BTC (${btcPrecio}). Esto invalidará los gatillos locales y ejecutará los cierres preventivos de riesgo.</p>
                     </div>
                     <div class="bg-zinc-950 p-3 rounded-lg border border-zinc-800/60 space-y-1">
-                        <h4 class="font-bold text-zinc-300">4. Advertencias Diarias</h4>
-                        <p class="text-zinc-400">Alta selectividad de liquidez en el mercado actual. Se prioriza estrictamente la acciÃ³n del precio y el volumen real en cierres de velas diarias sobre indicadores tÃ©cnicos retrasados.</p>
+                        <h4 class="font-bold text-zinc-300">4. Advertencias DiDaily</h4>
+                        <p class="text-zinc-400">Alta selectividad de liquidez en el mercado actual. Se prioriza estrictamente la acción del precio y el volumen real en cierres de velas diarias sobre indicadores técnicos retrasados.</p>
                     </div>
                 </div>
             `;
 
-            // 5. FOOTER & DISCLAIMER
             const footerHTML = `
                 <div class="border-t border-zinc-800 pt-4 text-[11px] text-zinc-500 space-y-3">
-                    <p class="leading-relaxed"><span class="font-semibold text-zinc-400 block mb-0.5">âš ï¸ Descargo de responsabilidad</span>
-                    Este anÃ¡lisis refleja Ãºnicamente mi punto de vista personal basado en la informaciÃ³n grÃ¡fica proporcionada. No constituye una recomendaciÃ³n de inversiÃ³n. El mercado de las criptomonedas es altamente volÃ¡til y cualquier operaciÃ³n conlleva riesgos significativos. Se recomienda realizar su propio anÃ¡lisis y gestiÃ³n de riesgo antes de tomar decisiones financieras.</p>
-                    <p class="text-center font-semibold text-emerald-400/80 border-t border-zinc-900 pt-2 text-xs">si mi contenido te es Ãºtil dale manito arriba y ayÃºdame a seguir analizando para ti.</p>
+                    <p class="leading-relaxed"><span class="font-semibold text-zinc-400 block mb-0.5">⚠️ Descargo de responsabilidad</span>
+                    Este análisis refleja únicamente mi punto de vista personal basado en la información gráfica proporcionada. No constituye una recomendación de inversión. El mercado de las criptomonedas es altamente volátil y cualquier operación conlleva riesgos significativos. Se recomienda realizar su propio análisis y gestión de riesgo antes de tomar decisiones financieras.</p>
+                    <p class="text-center font-semibold text-emerald-400/80 border-t border-zinc-900 pt-2 text-xs">si mi contenido te es útil dale manito arriba y ayúdame a seguir analizando para ti.</p>
                 </div>
             `;
 
             container.innerHTML = headerHTML + dashboardHTML + topActivosHTML + escenariosHTML + footerHTML;
         }
 
-        // FunciÃ³n del nuevo botÃ³n para copiar el texto formateado
         function copySharedText() {
             if (!textReportForSharing) return;
             
-            navigator.clipboard.writeText(textReportForSharing).then(() => {
-                alert("ðŸš€ Â¡Reporte estructurado copiado al portapapeles! Listo para pegar en Telegram o WhatsApp.");
-            }).catch(err => {
-                console.error("Error al copiar texto: ", err);
-            });
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(textReportForSharing).then(() => {
+                    alert("🚀 ¡Reporte copiado! Listo para pegar en Telegram o WhatsApp.");
+                }).catch(() => {
+                    executeFallbackCopy(textReportForSharing);
+                });
+            } else {
+                executeFallbackCopy(textReportForSharing);
+            }
+        }
+
+        function executeFallbackCopy(text) {
+            const tempTextArea = document.createElement("textarea");
+            tempTextArea.value = text;
+            tempTextArea.style.position = "fixed"; 
+            tempTextArea.style.top = "0";
+            tempTextArea.style.left = "0";
+            tempTextArea.style.opacity = "0"; 
+            document.body.appendChild(tempTextArea);
+            tempTextArea.focus();
+            tempTextArea.select();
+            
+            try {
+                document.execCommand('copy');
+                alert("🚀 ¡Reporte copiado con éxito (Modo Local)! Listo para pegar en tus redes.");
+            } catch (err) {
+                alert("Error crítico: Tu navegador bloqueó por completo el copiado automático local.");
+            }
+            document.body.removeChild(tempTextArea);
         }
 
         setDate();
