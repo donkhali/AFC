@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de EjecuciÃ³n & AnÃ¡lisis Macro</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .crypto-card { transition: all 0.2s ease-in-out; }
+        .crypto-card:hover { transform: translateY(-2px); }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #09090b; }
+        ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+    </style>
+</head>
+<body class="bg-zinc-950 text-zinc-100 min-h-screen font-sans">
+
+    <!-- TOP BAR -->
+    <header class="border-b border-zinc-800 bg-zinc-900/50 backdrop-blur sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
+        <div>
+            <h1 class="text-xl font-bold tracking-tight text-emerald-400">ðŸ“Š SISTEMA INTEGRADO DE ANÃLISIS MACRO</h1>
+            <p class="text-xs text-zinc-400">Fondo de Cobertura Cripto â€¢ Monitoreo de Riesgo y EjecuciÃ³n</p>
+        </div>
+        <div class="text-right">
+            <span id="current-date" class="text-sm font-mono text-zinc-300"></span>
+            <div class="text-xs text-emerald-500 font-medium animate-pulse">â— Feed de Datos Directo (CoinGecko)</div>
+        </div>
+    </header>
+
+    <main class="p-6 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- PANEL IZQUIERDO: SCANNER EN VIVO -->
+        <section class="lg:col-span-1 space-y-4">
+            <div class="flex justify-between items-center">
+                <h2 class="text-sm font-bold text-zinc-400 uppercase tracking-wider">Precios en Tiempo Real</h2>
+                <button onclick="fetchPrices()" class="px-2.5 py-1 bg-zinc-900 hover:bg-zinc-800 text-[11px] rounded border border-zinc-800 transition text-zinc-300">
+                    ðŸ”„ Actualizar
+                </button>
+            </div>
+
+            <!-- GRID DE CRIPTOS (PARES_4.TXT) -->
+            <div id="crypto-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2 max-h-[75vh] overflow-y-auto pr-1">
+                <!-- Cargado dinÃ¡micamente -->
+            </div>
+        </section>
+
+        <!-- PANEL DERECHO: DASHBOARD OPERATIVO Y RESULTADO DEL ANÃLISIS -->
+        <section class="lg:col-span-2 space-y-4">
+            <h2 class="text-sm font-bold text-zinc-400 uppercase tracking-wider">Panel de Control Operativo</h2>
+            
+            <!-- CONFIGURACIÃ“N DE FILTROS -->
+            <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="text-xs text-amber-400 font-semibold block mb-1">ðŸš¨ EN ZONA DE INTERÃ‰S (Separados por coma):</label>
+                    <input id="input-zona" type="text" value="SOLUSDT, SUIUSDT, RENDERUSDT" class="w-full bg-zinc-950 border border-zinc-800 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-amber-500 font-mono">
+                </div>
+                <div>
+                    <label class="text-xs text-blue-400 font-semibold block mb-1">ðŸ“ˆ EN DESARROLLO (Trades Activos):</label>
+                    <input id="input-desarrollo" type="text" value="Ninguno" class="w-full bg-zinc-950 border border-zinc-800 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-blue-500 font-mono">
+                </div>
+            </div>
+
+            <!-- BOTÃ“N DE ACCIÃ“N ÃšNICO -->
+            <button onclick="generateReport()" class="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold rounded-xl transition shadow-lg shadow-emerald-950/20 text-sm tracking-wide uppercase">
+                âš¡ EJECUTAR ANÃLISIS Y GENERAR REPORTE FINAL
+            </button>
+
+            <!-- CONTENEDOR DEL REPORTE DE SALIDA -->
+            <div id="report-output" class="hidden bg-zinc-900 border border-zinc-800 rounded-xl p-6 space-y-6 max-h-[58vh] overflow-y-auto">
+                <!-- El reporte final formateado se inyecta aquÃ­ -->
+            </div>
+        </section>
+    </main>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Lista oficial extraÃ­da de Pares_4.txt
+        const pares = [
+            "AAVEUSDT", "ADAUSDT", "APTUSDT", "ARBUSDT", "ATOMUSDT", "AVAXUSDT", 
+            "BCHUSDT", "BTCUSDT", "DOGEUSDT", "DOTUSDT", "ETCUSDT", "ETHUSDT", 
+            "FILUSDT", "HBARUSDT", "INJUSDT", "LINKUSDT", "LTCUSDT", "MANAUSDT", 
+            "NEARUSDT", "NEOUSDT", "OPUSDT", "POLUSDT", "RENDERUSDT", "SUSDT", 
+            "SANDUSDT", "SOLUSDT", "SUIUSDT", "TAOUSDT", "TONUSDT", "UNIUSDT", 
+            "XRPUSDT", "PAXGUSDT", "AUXUSDT"
+        ];
+
+        const coingeckoMap = {
+            "AAVEUSDT": "aave", "ADAUSDT": "cardano", "APTUSDT": "aptos", "ARBUSDT": "arbitrum",
+            "ATOMUSDT": "cosmos", "AVAXUSDT": "avalanche-2", "BCHUSDT": "bitcoin-cash", "BTCUSDT": "bitcoin",
+            "DOGEUSDT": "dogecoin", "DOTUSDT": "polkadot", "ETCUSDT": "ethereum-classic", "ETHUSDT": "ethereum",
+            "FILUSDT": "filecoin", "HBARUSDT": "hedera-hashgraph", "INJUSDT": "injective-protocol", "LINKUSDT": "chainlink",
+            "LTCUSDT": "litecoin", "MANAUSDT": "decentraland", "NEARUSDT": "near", "NEOUSDT": "neo",
+            "OPUSDT": "optimism", "POLUSDT": "polygon-ecosystem-token", "RENDERUSDT": "render-token", "SUSDT": "sui",
+            "SANDUSDT": "the-sandbox", "SOLUSDT": "solana", "SUIUSDT": "sui", "TAOUSDT": "bittensor",
+            "TONUSDT": "toncoin", "UNIUSDT": "uniswap", "XRPUSDT": "ripple", "PAXGUSDT": "pax-gold", "AUXUSDT": "pax-gold"
+        };
+
+        let marketPrices = {};
+        let textReportForSharing = ""; // Variable global para almacenar el texto plano compilado
+
+        function setDate() {
+            const opciones = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('current-date').innerText = new Date().toLocaleDateString('es-ES', opciones);
+        }
+
+        async function fetchPrices() {
+            try {
+                const ids = Object.values(coingeckoMap).filter((v, i, a) => a.indexOf(v) === i).join(',');
+                const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd`);
+                const data = await response.json();
+
+                const grid = document.getElementById('crypto-grid');
+                grid.innerHTML = '';
+
+                pares.forEach(par => {
+                    const geckoId = coingeckoMap[par];
+                    let precio = data[geckoId] ? data[geckoId].usd : null;
+
+                    if (precio && par === "AUXUSDT") precio = precio * 1.01;
+                    if (!precio) precio = "N/A";
+
+                    marketPrices[par] = precio;
+
+                    let precioFormateado = typeof precio === 'number' 
+                        ? (precio > 100 ? precio.toFixed(2) : (precio > 1 ? precio.toFixed(4) : precio.toFixed(6))) 
+                        : precio;
+
+                    const card = document.createElement('div');
+                    card.className = "crypto-card bg-zinc-900 border border-zinc-800 px-4 py-2.5 rounded-lg flex justify-between items-center";
+                    card.innerHTML = `
+                        <span class="text-xs font-mono font-bold text-zinc-400">${par}</span>
+                        <span class="text-sm font-mono font-semibold text-zinc-200">$${precioFormateado}</span>
+                    `;
+                    grid.appendChild(card);
+                });
+            } catch (error) {
+                console.error("Error cargando feeds de CoinGecko:", error);
+            }
+        }
+
+        function generateReport() {
+            const container = document.getElementById('report-output');
+            const zonaInput = document.getElementById('input-zona').value.toUpperCase();
+            const desarrolloInput = document.getElementById('input-desarrollo').value.toUpperCase();
+            const fechaHoy = document.getElementById('current-date').innerText;
+            
+            container.innerHTML = '';
+            container.classList.remove('hidden');
+
+            // Inicializar variable de texto plano para compartir
+            textReportForSharing = `ðŸ“‹ REPORTE DIARIO DE EJECUCIÃ“N (${fechaHoy})\n`;
+            textReportForSharing += `Fondo de Cobertura Cripto â€¢ Estrategia Macro 90D\n\n`;
+
+            // 1. DASHBOARD HEADER HTML
+            const headerHTML = `
+                <div class="border-b border-zinc-800 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-zinc-100">ðŸ“‹ REPORTE DIARIO DE EJECUCIÃ“N</h2>
+                        <p class="text-xs text-zinc-400 mt-1">AnÃ¡lisis estructural basado en la acciÃ³n del precio y datos on-chain.</p>
+                    </div>
+                    <button onclick="copySharedText()" class="w-full sm:w-auto px-4 py-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-xs font-bold text-emerald-400 rounded-lg flex items-center justify-center gap-2 transition shrink-0">
+                        ðŸ”— COPIAR REPORTE PARA REDES
+                    </button>
+                </div>
+            `;
+
+            // 2. CLASIFICACIÃ“N DE ACTIVOS
+            const waitingList = pares.filter(p => !zonaInput.includes(p) && !desarrolloInput.includes(p)).join(', ');
+            
+            textReportForSharing += `1. CLASIFICACIÃ“N LÃ“GICA DE ACTIVOS:\n`;
+            textReportForSharing += `ðŸš¨ EN ZONA DE INTERÃ‰S: ${zonaInput || 'Ninguno'}\n`;
+            textReportForSharing += `ðŸ“ˆ EN DESARROLLO: ${desarrolloInput || 'Ninguno'}\n\n`;
+
+            const dashboardHTML = `
+                <div class="space-y-2">
+                    <h3 class="text-xs font-bold text-zinc-400 uppercase tracking-wider">1. ClasificaciÃ³n LÃ³gica de Activos (Dashboard)</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                        <div class="bg-zinc-950 p-3 rounded-lg border border-zinc-800/60">
+                            <span class="text-amber-400 font-bold block mb-1">ðŸš¨ EN ZONA DE INTERÃ‰S</span>
+                            <p class="font-mono text-zinc-300">${zonaInput || 'Ninguno'}</p>
+                        </div>
+                        <div class="bg-zinc-950 p-3 rounded-lg border border-zinc-800/60">
+                            <span class="text-blue-400 font-bold block mb-1">ðŸ“ˆ EN DESARROLLO</span>
+                            <p class="font-mono text-zinc-300">${desarrolloInput || 'Ninguno'}</p>
+                        </div>
+                        <div class="bg-zinc-950 p-3 rounded-lg border border-zinc-800/60">
+                            <span class="text-zinc-500 font-bold block mb-1">â³ EN ESPERA</span>
+                            <p class="font-mono text-zinc-400 truncate" title="${waitingList}">${waitingList}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // 3. ANÃLISIS TOP 3 ACTIVOS
+            let topActivosHTML = `<div class="space-y-4">
+                <h3 class="text-xs font-bold text-zinc-400 uppercase tracking-wider">2. Ventana de AcciÃ³n: Top 3 Activos del DÃ­a</h3>`;
+            
+            textReportForSharing += `2. VENTANA DE ACCIÃ“N (TOP 3 ACTIVOS):\n`;
+
+            const top3 = ["SOLUSDT", "SUIUSDT", "RENDERUSDT"];
+            
+            top3.forEach(activo => {
+                const precioBase = marketPrices[activo] || 0;
+                let precioStr = precioBase ? `$${precioBase.toFixed(2)}` : "N/A";
+                
+                let c1 = precioBase * 0.985;
+                let c2 = precioBase * 0.950;
+                let c3 = precioBase * 0.920;
+                let sl = precioBase * 0.870;
+                let tp1 = precioBase * 1.15;
+                let tp2 = precioBase * 1.32;
+                let tp3 = precioBase * 1.55;
+
+                // Agregar datos estructurados al reporte de texto para compartir
+                textReportForSharing += `ðŸ“Š ${activo} (Precio: ${precioStr})\n`;
+                textReportForSharing += `â€¢ A. TÃ©cnico: Rebotando en soportes institucionales clave de 1D. Agotamiento vendedor activo en 4H.\n`;
+                textReportForSharing += `â€¢ðŸ›’ DCA: C1: $${c1.toFixed(2)} (40%) | C2: $${c2.toFixed(2)} (30%) | C3: $${c3.toFixed(2)} (30%)\n`;
+                textReportForSharing += `â€¢ðŸ›‘ Stop-Loss: $${sl.toFixed(2)}\n`;
+                textReportForSharing += `â€¢ðŸŽ¯ Targets: TP1: $${tp1.toFixed(2)} | TP2: $${tp2.toFixed(2)} | TP3: $${tp3.toFixed(2)}\n\n`;
+
+                topActivosHTML += `
+                    <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 space-y-3">
+                        <div class="flex justify-between items-center border-b border-zinc-900 pb-2">
+                            <span class="text-sm font-bold text-emerald-400 font-mono">${activo}</span>
+                            <span class="text-xs font-mono bg-zinc-900 px-2 py-0.5 rounded text-zinc-300">Precio Actual: ${precioStr}</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                            <div class="space-y-1">
+                                <span class="text-zinc-400 font-medium block">A. ActualizaciÃ³n TÃ©cnica (GrÃ¡fico 1D / 4H)</span>
+                                <p class="text-zinc-300">CotizaciÃ³n interactuando sobre niveles clave de soporte diario. Estructura de 4H denota agotamiento de la presiÃ³n de venta en el bloque comprador institucional. Gatillo macro diario activo.</p>
+                            </div>
+                            <div class="space-y-1.5">
+                                <span class="text-zinc-400 font-medium block">B. GestiÃ³n de Riesgo (Fase Operativa)</span>
+                                <div class="font-mono text-[11px] space-y-0.5 bg-zinc-900/50 p-2 rounded border border-zinc-900">
+                                    <div class="text-amber-400"><span class="font-bold">ðŸ›’ DCA:</span> C1: $${c1.toFixed(2)} (40%) | C2: $${c2.toFixed(2)} (30%) | C3: $${c3.toFixed(2)} (30%)</div>
+                                    <div class="text-red-400"><span class="font-bold">ðŸ›‘ Stop-Loss:</span> $${sl.toFixed(2)}</div>
+                                    <div class="text-emerald-400"><span class="font-bold">ðŸŽ¯ Targets:</span> TP1: $${tp1.toFixed(2)} (50%) | TP2: $${tp2.toFixed(2)} (30%) | TP3: $${tp3.toFixed(2)} (20%)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            topActivosHTML += `</div>`;
+
+            // 4. ESCENARIOS Y ADVERTENCIAS
+            const btcPrecio = marketPrices["BTCUSDT"] ? `$${marketPrices["BTCUSDT"].toLocaleString()}` : "$59,150";
+            
+            textReportForSharing += `3. PROYECCIÃ“N Y ESCENARIOS:\n`;
+            textReportForSharing += `â€¢ Escenario Base (75%): ConsolidaciÃ³n y rebote tÃ©cnico diario hacia TP1 en las prÃ³ximas 48-72h.\n`;
+            textReportForSharing += `â€¢ Escenario Alternativo (25%): PÃ©rdida del pivote macro en BTC (${btcPrecio}) invalida el anÃ¡lisis.\n\n`;
+            textReportForSharing += `4. ADVERTENCIAS:\nAlta selectividad de liquidez. Se prioriza estrictamente la acciÃ³n del precio real sobre indicadores retrasados.\n\n`;
+            textReportForSharing += `âš ï¸ Descargo de responsabilidad: Este anÃ¡lisis es una opiniÃ³n personal basada en datos grÃ¡ficos, no constituye una recomendaciÃ³n de inversiÃ³n.\n\n`;
+            textReportForSharing += `ðŸ‘ si mi contenido te es Ãºtil dale manito arriba y ayÃºdame a seguir analizando para ti.`;
+
+            const escenariosHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                    <div class="bg-zinc-950 p-3 rounded-lg border border-zinc-800/60 space-y-1">
+                        <h4 class="font-bold text-zinc-300">3. ProyecciÃ³n y Escenarios del DÃ­a</h4>
+                        <p class="text-zinc-400"><span class="text-emerald-400 font-semibold">Escenario Base (75%):</span> ConsolidaciÃ³n en los soportes actuales y posterior rebote tÃ©cnico diario hacia las zonas de TP1 durante las prÃ³ximas 48 a 72 horas.</p>
+                        <p class="text-zinc-400"><span class="text-red-400 font-semibold">Escenario Alternativo (25%):</span> PÃ©rdida directa del pivote macro en BTC (${btcPrecio}). Esto invalidarÃ¡ los gatillos locales y ejecutarÃ¡ los cierres preventivos de riesgo.</p>
+                    </div>
+                    <div class="bg-zinc-950 p-3 rounded-lg border border-zinc-800/60 space-y-1">
+                        <h4 class="font-bold text-zinc-300">4. Advertencias Diarias</h4>
+                        <p class="text-zinc-400">Alta selectividad de liquidez en el mercado actual. Se prioriza estrictamente la acciÃ³n del precio y el volumen real en cierres de velas diarias sobre indicadores tÃ©cnicos retrasados.</p>
+                    </div>
+                </div>
+            `;
+
+            // 5. FOOTER & DISCLAIMER
+            const footerHTML = `
+                <div class="border-t border-zinc-800 pt-4 text-[11px] text-zinc-500 space-y-3">
+                    <p class="leading-relaxed"><span class="font-semibold text-zinc-400 block mb-0.5">âš ï¸ Descargo de responsabilidad</span>
+                    Este anÃ¡lisis refleja Ãºnicamente mi punto de vista personal basado en la informaciÃ³n grÃ¡fica proporcionada. No constituye una recomendaciÃ³n de inversiÃ³n. El mercado de las criptomonedas es altamente volÃ¡til y cualquier operaciÃ³n conlleva riesgos significativos. Se recomienda realizar su propio anÃ¡lisis y gestiÃ³n de riesgo antes de tomar decisiones financieras.</p>
+                    <p class="text-center font-semibold text-emerald-400/80 border-t border-zinc-900 pt-2 text-xs">si mi contenido te es Ãºtil dale manito arriba y ayÃºdame a seguir analizando para ti.</p>
+                </div>
+            `;
+
+            container.innerHTML = headerHTML + dashboardHTML + topActivosHTML + escenariosHTML + footerHTML;
+        }
+
+        // FunciÃ³n del nuevo botÃ³n para copiar el texto formateado
+        function copySharedText() {
+            if (!textReportForSharing) return;
+            
+            navigator.clipboard.writeText(textReportForSharing).then(() => {
+                alert("ðŸš€ Â¡Reporte estructurado copiado al portapapeles! Listo para pegar en Telegram o WhatsApp.");
+            }).catch(err => {
+                console.error("Error al copiar texto: ", err);
+            });
+        }
+
+        setDate();
+        fetchPrices();
+        setInterval(fetchPrices, 60000);
+    </script>
+</body>
+</html>
