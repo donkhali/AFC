@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard de Ejecución & Análisis Macro</title>
     
-    <!-- CONFIGURACIÓN DE ICONOS PARA NAVEGADOR Y TELÉFONO -->
-    <link rel="icon" type="image/png" href="comercio.png">
-    <link rel="apple-touch-icon" href="comercio.png">
+    <!-- CONFIGURACIÓN DE ICONOS CORREGIDA PARA SUBDIRECTORIOS (GITHUB PAGES) -->
+    <link rel="icon" type="image/png" href="./comercio.png">
+    <link rel="apple-touch-icon" href="./comercio.png">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="MacroAnálisis">
@@ -28,8 +28,8 @@
     <!-- TOP BAR -->
     <header class="border-b border-zinc-800 bg-zinc-900/50 backdrop-blur sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
         <div class="flex items-center gap-3">
-            <!-- Miniatura del icono en la barra superior -->
-            <img src="comercio.png" alt="Logo" class="w-7 h-7 object-contain">
+            <!-- Ruta corregida para el logo del Header -->
+            <img src="./comercio.png" alt="Logo" class="w-7 h-7 object-contain">
             <div>
                 <h1 class="text-xl font-bold tracking-tight text-emerald-400">📊 SISTEMA INTEGRADO DE ANÁLISIS MACRO</h1>
                 <p class="text-xs text-zinc-400">Fondo de Cobertura Cripto • Monitoreo de Riesgo y Ejecución</p>
@@ -52,7 +52,7 @@
                 </button>
             </div>
 
-            <!-- GRID DE CRIPTOS (PARES_4.TXT) -->
+            <!-- GRID DE CRIPTOS -->
             <div id="crypto-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2 max-h-[75vh] overflow-y-auto pr-1">
                 <!-- Cargado dinámicamente -->
             </div>
@@ -269,7 +269,7 @@
                         <p class="text-zinc-400"><span class="text-red-400 font-semibold">Escenario Alternativo (25%):</span> Pérdida directa del pivote macro en BTC (${btcPrecio}). Esto invalidará los gatillos locales y ejecutará los cierres preventivos de riesgo.</p>
                     </div>
                     <div class="bg-zinc-950 p-3 rounded-lg border border-zinc-800/60 space-y-1">
-                        <h4 class="font-bold text-zinc-300">4. Advertencias DiDaily</h4>
+                        <h4 class="font-bold text-zinc-300">4. Advertencias Diarias</h4>
                         <p class="text-zinc-400">Alta selectividad de liquidez en el mercado actual. Se prioriza estrictamente la acción del precio y el volumen real en cierres de velas diarias sobre indicadores técnicos retrasados.</p>
                     </div>
                 </div>
@@ -278,7 +278,7 @@
             const footerHTML = `
                 <div class="border-t border-zinc-800 pt-4 text-[11px] text-zinc-500 space-y-3">
                     <p class="leading-relaxed"><span class="font-semibold text-zinc-400 block mb-0.5">⚠️ Descargo de responsabilidad</span>
-                    Este análisis refleja únicamente mi punto de vista personal basado en la información gráfica proporcionada. No constituye una recomendación de inversión. El mercado de las criptomonedas es altamente volátil y cualquier operación conlleva riesgos significativos. Se recomienda realizar su propio análisis y gestión de riesgo antes de tomar decisiones financieras.</p>
+                    Este análisis refleja únicamente mi punto de vista personal basado en la información gráfica proporcionada. No constituye una recomendación de inversión. El mercado de las criptomonedas es altamente volátil y cualquier operation conlleva riesgos significativos. Se recomienda realizar su propio análisis y gestión de riesgo antes de tomar decisiones financieras.</p>
                     <p class="text-center font-semibold text-emerald-400/80 border-t border-zinc-900 pt-2 text-xs">si mi contenido te es útil dale manito arriba y ayúdame a seguir analizando para ti.</p>
                 </div>
             `;
