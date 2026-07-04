@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard de Ejecución & Análisis Macro</title>
     
-    <!-- CONFIGURACIÓN DE ICONOS CORREGIDA PARA SUBDIRECTORIOS (GITHUB PAGES) -->
+    <!-- CONFIGURACIÓN DE ICONOS PARA SUBDIRECTORIOS (GITHUB PAGES) -->
     <link rel="icon" type="image/png" href="./comercio.png">
     <link rel="apple-touch-icon" href="./comercio.png">
     <meta name="mobile-web-app-capable" content="yes">
@@ -28,7 +28,6 @@
     <!-- TOP BAR -->
     <header class="border-b border-zinc-800 bg-zinc-900/50 backdrop-blur sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
         <div class="flex items-center gap-3">
-            <!-- Ruta corregida para el logo del Header -->
             <img src="./comercio.png" alt="Logo" class="w-7 h-7 object-contain">
             <div>
                 <h1 class="text-xl font-bold tracking-tight text-emerald-400">📊 SISTEMA INTEGRADO DE ANÁLISIS MACRO</h1>
@@ -152,6 +151,7 @@
             }
         }
 
+        // Función corregida y blindada contra errores sintácticos
         function generateReport() {
             const container = document.getElementById('report-output');
             const zonaInput = document.getElementById('input-zona').value.toUpperCase();
@@ -161,8 +161,9 @@
             container.innerHTML = '';
             container.classList.remove('hidden');
 
-            textReportForSharing = `📋 REPORTE DIARIO DE EJECUCIÓN (${fechaHoy})\n`;[cite: 6]
-            textReportForSharing += `Fondo de Cobertura Cripto • Estrategia Macro 90D\n\n`;[cite: 6]
+            // Construcción del reporte de texto plano para compartir
+            textReportForSharing = `📋 REPORTE DIARIO DE EJECUCIÓN (${fechaHoy})\n`; //[cite: 6]
+            textReportForSharing += `Fondo de Cobertura Cripto • Estrategia Macro 90D\n\n`; //[cite: 6]
 
             const headerHTML = `
                 <div class="border-b border-zinc-800 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -178,9 +179,9 @@
 
             const waitingList = pares.filter(p => !zonaInput.includes(p) && !desarrolloInput.includes(p)).join(', ');
             
-            textReportForSharing += `1. CLASIFICACIÓN LÓGICA DE ACTIVOS:\n`;[cite: 6]
-            textReportForSharing += `🚨 EN ZONA DE INTERÉS: ${zonaInput || 'Ninguno'}\n`;[cite: 6]
-            textReportForSharing += `📈 EN DESARROLLO: ${desarrolloInput || 'Ninguno'}\n\n`;[cite: 6]
+            textReportForSharing += `1. CLASIFICACIÓN LÓGICA DE ACTIVOS:\n`; //[cite: 6]
+            textReportForSharing += `🚨 EN ZONA DE INTERÉS: ${zonaInput || 'Ninguno'}\n`; //[cite: 6]
+            textReportForSharing += `📈 EN DESARROLLO: ${desarrolloInput || 'Ninguno'}\n\n`; //[cite: 6]
 
             const dashboardHTML = `
                 <div class="space-y-2">
@@ -205,12 +206,14 @@
             let topActivosHTML = `<div class="space-y-4">
                 <h3 class="text-xs font-bold text-zinc-400 uppercase tracking-wider">2. Ventana de Acción: Top 3 Activos del Día</h3>`;
             
-            textReportForSharing += `2. VENTANA DE ACCIÓN (TOP 3 ACTIVOS):\n`;[cite: 6]
+            textReportForSharing += `2. VENTANA DE ACCIÓN (TOP 3 ACTIVOS):\n`; //[cite: 6]
 
             const top3 = ["SOLUSDT", "SUIUSDT", "RENDERUSDT"];
             
             top3.forEach(activo => {
-                const precioBase = marketPrices[activo] || 0;
+                const rawPrice = marketPrices[activo];
+                // Blindaje contra variables no numéricas o "N/A"
+                const precioBase = (rawPrice && rawPrice !== "N/A") ? parseFloat(rawPrice) : 0;
                 let precioStr = precioBase ? `$${precioBase.toFixed(2)}` : "N/A";
                 
                 let c1 = precioBase * 0.985;
@@ -221,11 +224,11 @@
                 let tp2 = precioBase * 1.32;
                 let tp3 = precioBase * 1.55;
 
-                textReportForSharing += `📊 ${activo} (Precio: ${precioStr})\n`;[cite: 6]
-                textReportForSharing += `• A. Técnico: Rebotando en soportes institucionales clave de 1D. Agotamiento vendedor activo en 4H.\n`;[cite: 6]
-                textReportForSharing += `• 🛒 DCA: C1: $${c1.toFixed(2)} (40%) | C2: $${c2.toFixed(2)} (30%) | C3: $${c3.toFixed(2)} (30%)\n`;[cite: 6]
-                textReportForSharing += `• 🛑 Stop-Loss: $${sl.toFixed(2)}\n`;[cite: 6]
-                textReportForSharing += `• 🎯 Targets: TP1: $${tp1.toFixed(2)} | TP2: $${tp2.toFixed(2)} | TP3: $${tp3.toFixed(2)}\n\n`;[cite: 6]
+                textReportForSharing += `📊 ${activo} (Precio: ${precioStr})\n`; //[cite: 6]
+                textReportForSharing += `• A. Técnico: Rebotando en soportes institucionales clave de 1D. Agotamiento vendedor activo en 4H.\n`; //[cite: 6]
+                textReportForSharing += `• 🛒 DCA: C1: $${c1.toFixed(2)} (40%) | C2: $${c2.toFixed(2)} (30%) | C3: $${c3.toFixed(2)} (30%)\n`; //[cite: 6]
+                textReportForSharing += `• 🛑 Stop-Loss: $${sl.toFixed(2)}\n`; //[cite: 6]
+                textReportForSharing += `• 🎯 Targets: TP1: $${tp1.toFixed(2)} | TP2: $${tp2.toFixed(2)} | TP3: $${tp3.toFixed(2)}\n\n`; //[cite: 6]
 
                 topActivosHTML += `
                     <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 space-y-3">
@@ -254,12 +257,12 @@
 
             const btcPrecio = marketPrices["BTCUSDT"] ? `$${marketPrices["BTCUSDT"].toLocaleString()}` : "$59,150";
             
-            textReportForSharing += `3. PROYECCIÓN Y ESCENARIOS:\n`;[cite: 6]
-            textReportForSharing += `• Escenario Base (75%): Consolidación y rebote técnico diario hacia TP1 en las próximas 48-72h.\n`;[cite: 6]
-            textReportForSharing += `• Escenario Alternativo (25%): Pérdida del pivote macro en BTC (${btcPrecio}) invalida el análisis.\n\n`;[cite: 6]
-            textReportForSharing += `4. ADVERTENCIAS:\nAlta selectividad de liquidez. Se prioriza estrictamente la acción del precio real sobre indicadores retrasados.\n\n`;[cite: 6]
-            textReportForSharing += `⚠️ Descargo de responsabilidad: Este análisis es una opinión personal basada en datos gráficos, no constituye una recomendación de inversión.\n\n`;[cite: 6]
-            textReportForSharing += `👍 si mi contenido te es útil dale manito arriba y ayúdame a seguir analizando para ti.`;[cite: 6]
+            textReportForSharing += `3. PROYECCIÓN Y ESCENARIOS:\n`; //[cite: 6]
+            textReportForSharing += `• Escenario Base (75%): Consolidación y rebote técnico diario hacia TP1 en las próximas 48-72h.\n`; //[cite: 6]
+            textReportForSharing += `• Escenario Alternativo (25%): Pérdida del pivote macro en BTC (${btcPrecio}) invalida el análisis.\n\n`; //[cite: 6]
+            textReportForSharing += `4. ADVERTENCIAS:\nAlta selectividad de liquidez. Se prioriza estrictamente la acción del precio real sobre indicadores retrasados.\n\n`; //[cite: 6]
+            textReportForSharing += `⚠️ Descargo de responsabilidad: Este análisis es una opinión personal basada en datos gráficos, no constituye una recomendación de inversión.\n\n`; //[cite: 6]
+            textReportForSharing += `👍 si mi contenido te es útil dale manito arriba y ayúdame a seguir analizando para ti.`; //[cite: 6]
 
             const escenariosHTML = `
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
@@ -278,7 +281,7 @@
             const footerHTML = `
                 <div class="border-t border-zinc-800 pt-4 text-[11px] text-zinc-500 space-y-3">
                     <p class="leading-relaxed"><span class="font-semibold text-zinc-400 block mb-0.5">⚠️ Descargo de responsabilidad</span>
-                    Este análisis refleja únicamente mi punto de vista personal basado en la información gráfica proporcionada. No constituye una recomendación de inversión. El mercado de las criptomonedas es altamente volátil y cualquier operation conlleva riesgos significativos. Se recomienda realizar su propio análisis y gestión de riesgo antes de tomar decisiones financieras.</p>
+                    Este análisis refleja únicamente mi punto de vista personal basado en la información gráfica proporcionada. No constituye una recomendación de inversión. El mercado de las criptomonedas es altamente volátil y cualquier operación conlleva riesgos significativos. Se recomienda realizar su propio análisis y gestión de riesgo antes de tomar decisiones financieras.</p>
                     <p class="text-center font-semibold text-emerald-400/80 border-t border-zinc-900 pt-2 text-xs">si mi contenido te es útil dale manito arriba y ayúdame a seguir analizando para ti.</p>
                 </div>
             `;
